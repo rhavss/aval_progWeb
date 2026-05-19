@@ -1,0 +1,166 @@
+/* ==========================================================================
+   ESTILO TEMÁTICO: LIVRO DE RECEITAS DIGITAL
+   ========================================================================== */
+
+/* Importação de fontes clássicas e aconchegantes */
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@400;700&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Crimson Pro', Georgia, serif;
+    background-color: #f4eedb; /* Cor de fundo creme (lembrando farinha ou mesa de cozinha) */
+    background-image: radial-gradient(#e6dcbf 1px, transparent 1px);
+    background-size: 20px 20px; /* Leve textura pontilhada vintage */
+    color: #42342b;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* O Bloco do Painel/Formulário transformado em Livrinho de Receitas */
+form {
+    background-color: #fffdf9; /* Página interna limpa do livro */
+    border: 1px solid #d1c4b2;
+    border-left: 22px solid #8c2d19; /* Lombada grossa de couro/tecido do livro */
+    border-radius: 6px 16px 16px 6px;
+    padding: 40px 35px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 10px 25px rgba(84, 59, 45, 0.2), 
+                inset 1px 0 0 rgba(255,255,255,0.2);
+    position: relative;
+}
+
+/* Detalhe da costura dourada na lombada do livro */
+form::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -12px;
+    bottom: 0;
+    width: 2px;
+    border-left: 2px dashed #d9a05b;
+    opacity: 0.6;
+}
+
+/* Título "Acesse sua conta" estilizado como cabeçalho de receita */
+h1 {
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 28px;
+    color: #8c2d19; /* Vermelho canela / massa de tomate */
+    text-align: center;
+    margin-bottom: 30px;
+    font-weight: 600;
+    border-bottom: 2px double #e0d5c1;
+    padding-bottom: 12px;
+    letter-spacing: 0.5px;
+}
+
+/* Parágrafos organizadores */
+p {
+    margin-bottom: 20px;
+}
+
+/* Textos de apoio e labels (Estilo moderno de lista de ingredientes) */
+label {
+    display: block;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #6e5645;
+    margin-bottom: 6px;
+    letter-spacing: 1px;
+}
+
+/* Inputs de Texto e Senha */
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 12px 14px;
+    font-family: 'Crimson Pro', serif;
+    font-size: 16px;
+    border: 1px solid #c2b29d;
+    border-radius: 4px;
+    background-color: #faf8f2;
+    color: #33261c;
+    transition: all 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+    outline: none;
+    border-color: #8c2d19;
+    background-color: #ffffff;
+    box-shadow: 0 0 6px rgba(140, 45, 25, 0.2);
+}
+
+/* Botão Entrar (Estilo etiqueta de pote de tempero / selo) */
+button[type="submit"] {
+    width: 100%;
+    background-color: #d95a36; /* Laranja abóbora/quente */
+    color: #ffffff;
+    border: none;
+    border-radius: 30px;
+    padding: 14px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #b33e1d;
+    transition: all 0.1s ease;
+    margin-top: 10px;
+}
+
+button[type="submit"]:hover {
+    background-color: #e66540;
+}
+
+button[type="submit"]:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 #b33e1d;
+}
+
+/* Estilização para as mensagens de erro do PHP */
+body {
+    /* Permite que o texto de erro jogado pelo echo fique bem posicionado antes do form */
+    font-size: 16px; 
+}
+
+/* Se quiser envelopar o erro em uma div depois, use essa classe: */
+.erro-mensagem {
+    background-color: #f7e4e1;
+    color: #b83227;
+    padding: 10px 15px;
+    border-radius: 4px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    text-align: center;
+    margin-bottom: 15px;
+    border: 1px solid #ebd0cc;
+    max-width: 400px;
+    width: 100%;
+}
+
+/* Links (Para o botão Sair do Painel e Voltar) */
+a {
+    color: #d95a36;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+a:hover {
+    color: #8c2d19;
+    text-decoration: underline;
+}
