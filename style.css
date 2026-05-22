@@ -14,10 +14,11 @@
 body {
     font-family: 'Crimson Pro', Georgia, serif;
     background-color: #f4eedb; /* Cor de fundo creme (lembrando farinha ou mesa de cozinha) */
-    background-image: radial-gradient(#e6dcbf 1px, transparent 1px);
-    background-size: 20px 20px; /* Leve textura pontilhada vintage */
+    background-image: url(bg.png);
+    background-position: center;
+    background-size: cover;
     color: #42342b;
-    min-height: 100vh;
+    min-height: 97vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -27,16 +28,58 @@ body {
 
 /* O Bloco do Painel/Formulário transformado em Livrinho de Receitas */
 form {
-    background-color: #fffdf9; /* Página interna limpa do livro */
+    background-color: #fffdf9;
     border: 1px solid #d1c4b2;
-    border-left: 22px solid #8c2d19; /* Lombada grossa de couro/tecido do livro */
+    border-left: 22px solid #8c2d19;
     border-radius: 6px 16px 16px 6px;
     padding: 40px 35px;
     width: 100%;
-    max-width: 400px;
-    box-shadow: 0 10px 25px rgba(84, 59, 45, 0.2), 
-                inset 1px 0 0 rgba(255,255,255,0.2);
-    position: relative;
+    max-width: 650px;
+    box-shadow: 0 10px 25px rgba(84, 59, 45, 0.2),
+                inset 1px 0 0 rgba(255, 255, 255, 0.2);
+    
+    /* Removemos o display: flex daqui para o form se comportar como bloco vertical */
+}
+
+/* Nova regra para fazer os campos e a imagem ficarem lado a lado, abaixo do h1 */
+.conteudo-form {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+    width: 100%;
+}
+
+/* Título "Acesse sua conta" estilizado como cabeçalho de receita */
+h1 {
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 28px;
+    color: #8c2d19; /* Vermelho canela / massa de tomate */
+    text-align: center;
+    margin-bottom: 30px;
+    font-weight: 600;
+    border-bottom: 5px double #e0d5c1;
+    padding-bottom: 12px;
+    letter-spacing: 0.5px;
+}
+
+/* Força os campos a ocuparem o lado esquerdo de forma organizada */
+.camposLogin {
+    flex: 1;
+}
+
+/* O CSS da imagem que agora vai funcionar */
+img {
+    display: block;
+    width: 282px;
+    height: 230px;
+    object-fit: cover; /* Não deixa a foto distorcer */
+    
+    /* A borda que sumia agora aparece porque a imagem virou block */
+    border: 1px solid #d1c4b2;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(84, 59, 45, 0.2);
 }
 
 /* Detalhe da costura dourada na lombada do livro */
@@ -49,19 +92,6 @@ form::after {
     width: 2px;
     border-left: 2px dashed #d9a05b;
     opacity: 0.6;
-}
-
-/* Título "Acesse sua conta" estilizado como cabeçalho de receita */
-h1 {
-    font-family: 'Crimson Pro', Georgia, serif;
-    font-size: 28px;
-    color: #8c2d19; /* Vermelho canela / massa de tomate */
-    text-align: center;
-    margin-bottom: 30px;
-    font-weight: 600;
-    border-bottom: 2px double #e0d5c1;
-    padding-bottom: 12px;
-    letter-spacing: 0.5px;
 }
 
 /* Parágrafos organizadores */
