@@ -66,7 +66,7 @@ if(isset($_POST['email']) || isset($_POST['senha'])) {
             <button type="submit">Entrar</button>
         </div>
 
-        <img src="imgForm.png">
+        <img src="imagens/imgForm.png">
         
     </div> 
 </form>

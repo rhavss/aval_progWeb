@@ -14,7 +14,7 @@
 body {
     font-family: 'Crimson Pro', Georgia, serif;
     background-color: #f4eedb; /* Cor de fundo creme (lembrando farinha ou mesa de cozinha) */
-    background-image: url(bg.png);
+    background-image: url(imagens/bg.png);
     background-position: center;
     background-size: cover;
     color: #42342b;
