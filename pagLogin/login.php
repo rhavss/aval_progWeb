@@ -131,7 +131,7 @@ if(isset($_POST['email']) || isset($_POST['senha'])) {
 
     h1 {
         font-family: 'Crimson Pro', Georgia, serif;
-        font-size: 26px;
+        font-size: 25.3px;
         color: #8c2d19; 
         text-align: center;
         font-weight: 600;
@@ -163,7 +163,7 @@ if(isset($_POST['email']) || isset($_POST['senha'])) {
 
     .img2 {
         display: block;
-        width: 56px;
+        width: 80px;
         height: 80px;
     }
 
