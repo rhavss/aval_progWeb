@@ -1,5 +1,5 @@
 <?php
-include('conexaoLogin.php');
+include('conexao.php');
 
 $erro = "";
 
