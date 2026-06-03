@@ -29,7 +29,7 @@ if(isset($_POST['email']) || isset($_POST['senha'])) {
             $_SESSION['id'] = $usuario['id'];
             $_SESSION['nome'] = $usuario['nome'];
 
-            header("Location: ../pagReceitas/receitas.php");
+            header("Location: receitas.php");
             exit();
         } else {
             $erro = "Seu e-mail ou sua senha estão incorretos";
@@ -44,7 +44,7 @@ if(isset($_POST['email']) || isset($_POST['senha'])) {
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" type="image/x-icon" href="../imagens/iconAba.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="imagens/iconAba.ico">
     <title>Login - Receitas do Gonger</title>
 </head>
 <body>
@@ -52,7 +52,7 @@ if(isset($_POST['email']) || isset($_POST['senha'])) {
 <form action="" method="POST">
     <div class="titulo">
 
-        <img class="img2" src="../imagens/icon.png">
+        <img class="img2" src="imagens/icon.png">
         <h1>Acesse o livro de receitas online de Gonger</h1>
 
     </div>
@@ -79,7 +79,7 @@ if(isset($_POST['email']) || isset($_POST['senha'])) {
             <button type="submit">Entrar</button>
         </div>
 
-        <img class="img1" src="../imagens/imgForm.png">
+        <img class="img1" src="imagens/imgForm.png">
 
     </div> 
 </form>
@@ -96,7 +96,7 @@ if(isset($_POST['email']) || isset($_POST['senha'])) {
     body {
         font-family: 'Crimson Pro', Georgia, serif;
         background-color: #f4eedb;
-        background-image: url(../imagens/bg.png);
+        background-image: url(imagens/bg.png);
         background-position: center;
         background-size: cover;
         color: #42342b;

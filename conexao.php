@@ -3,7 +3,7 @@
 $host = 'localhost';
 $usuario = 'root';
 $senha = '';
-$database = 'login';
+$database = 'bdCrudPw';
 
 $mysqli = new mysqli($host, $usuario, $senha, $database);
 
