@@ -333,7 +333,7 @@ $lista_receitas = $mysqli->query($sql_todas) or die($mysqli->error);
         line-height: 1.4;
         border-left: double 5px #e0d5c1;
         padding: 22px 0px;
-        padding-left: 18px;
+        padding-left: 16px;
     }
 
     .btn-adicionar {
@@ -367,12 +367,10 @@ $lista_receitas = $mysqli->query($sql_todas) or die($mysqli->error);
     .titulo-sessao {
         font-family: 'Crimson Pro', Georgia, serif;
         color: #8c2d19;
-        font-size: 25px;
+        font-size: 22px;
         margin-bottom: 50px;
         font-weight: 600;
         letter-spacing: 0.5px;
-        display: flex;
-        justify-content: center;
         padding-bottom: 12px;
         border-bottom: 5px double #e0d5c1;
     }
