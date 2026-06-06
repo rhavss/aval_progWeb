@@ -362,7 +362,7 @@ $lista_receitas = $mysqli->query($sql_todas) or die($mysqli->error);
         font-family: 'Crimson Pro', Georgia, serif;
         color: #8c2d19;
         font-size: 22px;
-        margin-bottom: 50px;
+        margin-bottom: 30px;
         font-weight: 600;
         letter-spacing: 0.5px;
         padding-bottom: 12px;
