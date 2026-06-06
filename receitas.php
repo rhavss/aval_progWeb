@@ -1,5 +1,7 @@
 <?php
-// Proteção da página: Garante que só quem passou pelo login.php possa acessar
+include('conexao.php'); 
+
+// Protect
 if (!isset($_SESSION)) {
     session_start();
 }
@@ -8,18 +10,11 @@ if (!isset($_SESSION['id'])) {
     die("Você não pode acessar esta página porque não está logado. <a href='login.php'>Clique aqui para fazer login</a>");
 }
 
-// Conexão com o banco (Usando o seu arquivo padrão)
-include('conexao.php'); 
-
 $mensagem = "";
 $acao = $_GET['acao'] ?? 'listar';
 $id_atual = isset($_GET['id']) ? intval($_GET['id']) : null;
 
-// ---------------------------------------
-// CONTROLADOR DE AÇÕES (C, U, D)
-// ---------------------------------------
-
-// Ação: Salvar (Criar ou Editar)
+// Create/Update
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $titulo = $mysqli->real_escape_string($_POST['titulo']);
     $categoria = $mysqli->real_escape_string($_POST['categoria']);
@@ -41,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $acao = 'listar'; 
 }
 
-// Ação: Deletar (Exclusão Definitiva do banco de dados)
+// Delete
 if ($acao === 'deletar' && $id_atual) {
     $sql = "DELETE FROM receitas WHERE id = $id_atual";
     $mysqli->query($sql) or die($mysqli->error);
@@ -49,7 +44,6 @@ if ($acao === 'deletar' && $id_atual) {
     $acao = 'listar';
 }
 
-// Buscar receita específica para ver detalhes ou editar
 $receita_selecionada = null;
 if (($acao === 'ver' || $acao === 'editar') && $id_atual) {
     $sql = "SELECT * FROM receitas WHERE id = $id_atual";
@@ -57,7 +51,7 @@ if (($acao === 'ver' || $acao === 'editar') && $id_atual) {
     $receita_selecionada = $resultado->fetch_assoc();
 }
 
-// READ (Buscar todas as receitas para a vitrine)
+// READ
 $sql_todas = "SELECT * FROM receitas ORDER BY id DESC";
 $lista_receitas = $mysqli->query($sql_todas) or die($mysqli->error);
 ?>
@@ -105,7 +99,7 @@ $lista_receitas = $mysqli->query($sql_todas) or die($mysqli->error);
             <img src="imagens/gonger.png" widht="100" height="100"> 
 
             <div class="banner-texto">
-                <h2>Veja algumas das receitas favoritas de Gonger e adicione as suas também:</h2>
+                <h2>Veja e interaja a vontade com o livro comunitário de receitas do Gonger:</h2>
             </div>
             <div class="banner-acoes">
                 <a href="receitas.php?acao=novo" class="btn-adicionar">+ ADICIONAR RECEITA</a>
@@ -333,7 +327,7 @@ $lista_receitas = $mysqli->query($sql_todas) or die($mysqli->error);
         line-height: 1.4;
         border-left: double 5px #e0d5c1;
         padding: 22px 0px;
-        padding-left: 16px;
+        padding-left: 18px;
     }
 
     .btn-adicionar {

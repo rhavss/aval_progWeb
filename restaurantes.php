@@ -1,5 +1,7 @@
 <?php
-// Proteção da página
+include('conexao.php'); 
+
+// Protect
 if (!isset($_SESSION)) {
     session_start();
 }
@@ -8,16 +10,12 @@ if (!isset($_SESSION['id'])) {
     die("Você não pode acessar esta página porque não está logado. <a href='login.php'>Clique aqui para fazer login</a>");
 }
 
-include('conexao.php'); 
-
 $mensagem = "";
 $acao = $_GET['acao'] ?? 'listar';
 $id_atual = isset($_GET['id']) ? intval($_GET['id']) : null;
 
-// ---------------------------------------
-// CONTROLADOR DE AÇÕES (C, U, D)
-// ---------------------------------------
 
+// Create/Update
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nome = $mysqli->real_escape_string($_POST['nome']);
     $tipo_comida = $mysqli->real_escape_string($_POST['tipo_comida']);
@@ -48,7 +46,6 @@ if ($acao === 'deletar' && $id_atual) {
     $acao = 'listar';
 }
 
-// Buscar restaurante específico para editar
 $restaurante_selecionado = null;
 if ($acao === 'editar' && $id_atual) {
     $sql = "SELECT * FROM restaurantes WHERE id = $id_atual";
@@ -56,7 +53,7 @@ if ($acao === 'editar' && $id_atual) {
     $restaurante_selecionado = $resultado->fetch_assoc();
 }
 
-// READ: Buscar todos os restaurantes
+// READ
 $sql_todos = "SELECT * FROM restaurantes ORDER BY id DESC";
 $lista_restaurantes = $mysqli->query($sql_todos) or die($mysqli->error);
 ?>

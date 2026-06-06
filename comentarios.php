@@ -1,5 +1,7 @@
 <?php
-// Proteção da página (mantida para seguir o padrão do seu painel)
+include('conexao.php'); 
+
+// Protect
 if (!isset($_SESSION)) {
     session_start();
 }
@@ -8,16 +10,12 @@ if (!isset($_SESSION['id'])) {
     die("Você não pode acessar esta página porque não está logado. <a href='login.php'>Clique aqui para fazer login</a>");
 }
 
-include('conexao.php'); 
-
 $mensagem = "";
 $acao = $_GET['acao'] ?? 'listar';
 $id_atual = isset($_GET['id']) ? intval($_GET['id']) : null;
 
-// ---------------------------------------
-// CONTROLADOR DE AÇÕES (C, U, D)
-// ---------------------------------------
 
+// Create/Update
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $receita_id = intval($_POST['receita_id']);
     $nome = $mysqli->real_escape_string($_POST['nome']);
@@ -26,12 +24,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = isset($_POST['id']) ? intval($_POST['id']) : null;
 
     if ($id) {
-        // UPDATE: Qualquer um pode editar
+        // UPDATE
         $sql = "UPDATE comentarios SET receita_id = $receita_id, nome = '$nome', nota = $nota, texto = '$texto' WHERE id = $id";
         $mysqli->query($sql) or die($mysqli->error);
         $mensagem = "O comentário foi corrigido com sucesso!";
     } else {
-        // CREATE: Novo comentário
+        // CREATE
         $sql = "INSERT INTO comentarios (receita_id, nome, nota, texto) VALUES ($receita_id, '$nome', $nota, '$texto')";
         $mysqli->query($sql) or die($mysqli->error);
         $mensagem = "Avaliação enviada! Obrigado por compartilhar sua experiência.";
@@ -39,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $acao = 'listar'; 
 }
 
-// DELETE: Remover comentário ofensivo ou spam
+// DELETE
 if ($acao === 'deletar' && $id_atual) {
     $sql = "DELETE FROM comentarios WHERE id = $id_atual";
     $mysqli->query($sql) or die($mysqli->error);
@@ -47,7 +45,6 @@ if ($acao === 'deletar' && $id_atual) {
     $acao = 'listar';
 }
 
-// Buscar comentário específico para editar
 $comentario_selecionado = null;
 if ($acao === 'editar' && $id_atual) {
     $sql = "SELECT * FROM comentarios WHERE id = $id_atual";
@@ -55,15 +52,13 @@ if ($acao === 'editar' && $id_atual) {
     $comentario_selecionado = $resultado->fetch_assoc();
 }
 
-// READ: Buscar todos os comentários (Do mais recente para o mais antigo)
-// Usamos um JOIN para trazer o nome da receita avaliada
+// READ
 $sql_todos = "SELECT c.*, r.titulo as nome_receita 
               FROM comentarios c 
               JOIN receitas r ON c.receita_id = r.id 
               ORDER BY c.id DESC";
 $lista_comentarios = $mysqli->query($sql_todos) or die($mysqli->error);
 
-// Buscar receitas para o formulário (Dropdown)
 $sql_receitas = "SELECT id, titulo FROM receitas ORDER BY titulo ASC";
 $lista_receitas_form = $mysqli->query($sql_receitas) or die($mysqli->error);
 ?>
