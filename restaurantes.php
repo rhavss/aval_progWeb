@@ -348,7 +348,7 @@ $lista_restaurantes = $mysqli->query($sql_todos) or die($mysqli->error);
         border-radius: 6px;
         margin-bottom: 20px;
         font-size: 14px;
-        border-left: 5px solid #3b82f6;
+
     }
 
     /* Formulário */
@@ -435,10 +435,9 @@ $lista_restaurantes = $mysqli->query($sql_todos) or die($mysqli->error);
     }
 
     .rest-nome {
-        font-family: 'Crimson Pro', Georgia, serif;
         font-weight: 700;
         color: #8c2d19;
-        font-size: 20px;
+        font-size: 16px;
         line-height: 1.2;
     }
 

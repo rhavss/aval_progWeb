@@ -357,7 +357,6 @@ $lista_receitas_form = $mysqli->query($sql_receitas) or die($mysqli->error);
         border-radius: 6px;
         margin-bottom: 20px;
         font-size: 14px;
-        border-left: 5px solid #3b82f6;
     }
 
     /* Formulário */
@@ -448,7 +447,7 @@ $lista_receitas_form = $mysqli->query($sql_receitas) or die($mysqli->error);
     .card-nome {
         font-weight: 700;
         color: #8c2d19;
-        font-size: 15px;
+        font-size: 16px;
     }
 
     .card-estrelas {
