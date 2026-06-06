@@ -493,6 +493,10 @@ $lista_receitas = $mysqli->query($sql_todas) or die($mysqli->error);
         font-weight: 600;
     }
 
+    .btn-ver-mais:hover {
+        color: #a9442e
+    }
+
     .mensagem-sucesso {
         background-color: #e6eff4;
         color: #134573;
