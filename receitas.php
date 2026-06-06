@@ -83,10 +83,10 @@ $lista_receitas = $mysqli->query($sql_todas) or die($mysqli->error);
             <a href="receitas.php" class="menu-item active">
                 <span class="icon"><img src="imagens/receitas.png" width="36" height="36"></span> Receitas
             </a>
-            <a href="#" class="menu-item">
+            <a href="comentarios.php" class="menu-item">
                 <span class="icon"><img src="imagens/comentarios.png" width="36" height="36"></span> Comentários
             </a>
-            <a href="#" class="menu-item">
+            <a href="restaurantes.php" class="menu-item">
                 <span class="icon"><img src="imagens/restaurantes.png" width="36" height="36"></span> Restaurantes
             </a>
         </nav>
@@ -186,7 +186,7 @@ $lista_receitas = $mysqli->query($sql_todas) or die($mysqli->error);
 
             <?php else: ?>
 
-                <h1 class="titulo-sessao">Sinta-se em casa para interagir com nosso livro comunitário de receitas!</h1>
+                <h1 class="titulo-sessao">Página de Receitas</h1>
 
                 <?php if ($lista_receitas->num_rows == 0): ?>
                     <div class="aviso-vazio">
