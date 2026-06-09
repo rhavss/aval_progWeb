@@ -20,7 +20,6 @@ CREATE TABLE IF NOT EXISTS comentarios (
     nome VARCHAR(100) NOT NULL,
     nota INT NOT NULL CHECK(nota >= 1 AND nota <= 5),
     texto TEXT NOT NULL,
-    data_comentario TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (receita_id) REFERENCES receitas(id) ON DELETE CASCADE
 );
 
@@ -31,5 +30,4 @@ CREATE TABLE IF NOT EXISTS restaurantes (
     localizacao VARCHAR(150) NOT NULL,
     nota INT NOT NULL CHECK(nota >= 1 AND nota <= 5),
     descricao TEXT NOT NULL,
-    data_indicacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
