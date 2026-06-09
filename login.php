@@ -27,7 +27,6 @@ if(isset($_POST['email']) || isset($_POST['senha'])) {
             }
 
             $_SESSION['id'] = $usuario['id'];
-            $_SESSION['nome'] = $usuario['nome'];
 
             header("Location: receitas.php");
             exit();
