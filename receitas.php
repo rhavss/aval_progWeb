@@ -7,7 +7,7 @@ if (!isset($_SESSION)) {
 }
 
 if (!isset($_SESSION['id'])) {
-    die("Você não pode acessar esta página porque não está logado. <a href='login.php'>Clique aqui para fazer login</a>");
+    die("Você não pode acessar esta página porque não está logado. <a href='index.php'>Clique aqui para fazer login</a>");
 }
 
 $mensagem = "";
@@ -16,44 +16,80 @@ $id_atual = isset($_GET['id']) ? intval($_GET['id']) : null;
 
 // Create/Update
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $titulo = $mysqli->real_escape_string($_POST['titulo']);
-    $categoria = $mysqli->real_escape_string($_POST['categoria']);
-    $ingredientes = $mysqli->real_escape_string($_POST['ingredientes']);
-    $preparo = $mysqli->real_escape_string($_POST['preparo']);
-    $id = isset($_POST['id']) ? intval($_POST['id']) : null;
+    $titulo = trim($_POST['titulo']);
+    $categoria = trim($_POST['categoria']);
+    $ingredientes = trim($_POST['ingredientes']);
+    $preparo = trim($_POST['preparo']);
+    $id = !empty($_POST['id']) ? intval($_POST['id']) : null;
 
-    if ($id) {
-        // UPDATE
-        $sql = "UPDATE receitas SET titulo = '$titulo', categoria = '$categoria', ingredientes = '$ingredientes', preparo = '$preparo' WHERE id = $id";
-        $mysqli->query($sql) or die($mysqli->error);
-        $mensagem = "Receita atualizada com carinho por um membro da cozinha!";
-    } else {
-        // CREATE
-        $sql = "INSERT INTO receitas (titulo, categoria, ingredientes, preparo) VALUES ('$titulo', '$categoria', '$ingredientes', '$preparo')";
-        $mysqli->query($sql) or die($mysqli->error);
-        $mensagem = "Que cheirinho bom! Sua receita foi compartilhada com o livro do Gonger!";
+    try {
+        //Update
+        if ($id) {
+            $sql = "UPDATE receitas SET titulo = :titulo, categoria = :categoria, ingredientes = :ingredientes, preparo = :preparo WHERE id = :id";
+            $stmt = $pdo->prepare($sql);
+            
+            $stmt->bindParam(':titulo', $titulo);
+            $stmt->bindParam(':categoria', $categoria);
+            $stmt->bindParam(':ingredientes', $ingredientes);
+            $stmt->bindParam(':preparo', $preparo);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            
+            $stmt->execute();
+            $mensagem = "Receita atualizada com carinho por um membro da cozinha!";
+        //Create
+        } else {
+            $sql = "INSERT INTO receitas (titulo, categoria, ingredientes, preparo) VALUES (:titulo, :categoria, :ingredientes, :preparo)";
+            $stmt = $pdo->prepare($sql);
+            
+            $stmt->bindParam(':titulo', $titulo);
+            $stmt->bindParam(':categoria', $categoria);
+            $stmt->bindParam(':ingredientes', $ingredientes);
+            $stmt->bindParam(':preparo', $preparo);
+            
+            $stmt->execute();
+            $mensagem = "Que cheirinho bom! Sua receita foi compartilhada com o livro do Gonger!";
+        }
+    } catch (PDOException $e) {
+        die("Erro ao salvar receita: " . $e->getMessage());
     }
+    
     $acao = 'listar'; 
 }
 
 // Delete
 if ($acao === 'deletar' && $id_atual) {
-    $sql = "DELETE FROM receitas WHERE id = $id_atual";
-    $mysqli->query($sql) or die($mysqli->error);
-    $mensagem = "A receita foi excluída permanentemente do livro!";
+    try {
+        $sql = "DELETE FROM receitas WHERE id = :id";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':id', $id_atual, PDO::PARAM_INT);
+        $stmt->execute();
+        $mensagem = "A receita foi excluída permanentemente do livro!";
+    } catch (PDOException $e) {
+        die("Erro ao deletar receita: " . $e->getMessage());
+    }
     $acao = 'listar';
 }
 
 $receita_selecionada = null;
 if (($acao === 'ver' || $acao === 'editar') && $id_atual) {
-    $sql = "SELECT * FROM receitas WHERE id = $id_atual";
-    $resultado = $mysqli->query($sql) or die($mysqli->error);
-    $receita_selecionada = $resultado->fetch_assoc();
+    try {
+        $sql = "SELECT * FROM receitas WHERE id = :id";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':id', $id_atual, PDO::PARAM_INT);
+        $stmt->execute();
+        $receita_selecionada = $stmt->fetch(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+         die("Erro ao buscar receita: " . $e->getMessage());
+    }
 }
 
 // READ
-$sql_todas = "SELECT * FROM receitas ORDER BY id DESC";
-$lista_receitas = $mysqli->query($sql_todas) or die($mysqli->error);
+try {
+    $sql_todas = "SELECT * FROM receitas ORDER BY id DESC";
+    $stmt_todas = $pdo->query($sql_todas);
+} catch (PDOException $e) {
+    die("Erro ao carregar lista de receitas: " . $e->getMessage());
+}
 ?>
 
 <!DOCTYPE html>
@@ -86,7 +122,7 @@ $lista_receitas = $mysqli->query($sql_todas) or die($mysqli->error);
         </nav>
         
         <div class="sidebar-footer">
-            <a href="login.php" class="btn-sair">
+            <a href="index.php" class="btn-sair">
                 <span class="icon"><img src="imagens/sair.png" width="32" height="32"></span> Sair
             </a>
         </div>
@@ -95,9 +131,7 @@ $lista_receitas = $mysqli->query($sql_todas) or die($mysqli->error);
     <div class="conteudo-principal">
         
         <header class="banner-topo">
-
-            <img src="imagens/gonger.png" widht="100" height="100"> 
-
+            <img src="imagens/gonger.png" width="100" height="100"> 
             <div class="banner-texto">
                 <h2>Veja e interaja a vontade com o livro comunitário de receitas do Gonger:</h2>
             </div>
@@ -181,15 +215,14 @@ $lista_receitas = $mysqli->query($sql_todas) or die($mysqli->error);
             <?php else: ?>
 
                 <h1 class="titulo-sessao">Página de Receitas</h1>
-
-                <?php if ($lista_receitas->num_rows == 0): ?>
+                <?php if ($stmt_todas->rowCount() == 0): ?>
                     <div class="aviso-vazio">
                         <h3>O fogão está desligado...</h3>
                         <p>Nenhuma receita foi enviada ainda. Que tal estrear o caderno clicando em <strong>"Adicionar Receita"</strong> ali em cima?</p>
                     </div>
                 <?php else: ?>
                     <div class="grade-receitas">
-                        <?php while($r = $lista_receitas->fetch_assoc()): ?>
+                        <?php while($r = $stmt_todas->fetch(PDO::FETCH_ASSOC)): ?>
                             <div class="card-receita">
                                 <span class="card-categoria"><?php echo $r['categoria']; ?></span>
                                 <h3 class="card-titulo"><?php echo $r['titulo']; ?></h3>

@@ -7,7 +7,7 @@ if (!isset($_SESSION)) {
 }
 
 if (!isset($_SESSION['id'])) {
-    die("Você não pode acessar esta página porque não está logado. <a href='login.php'>Clique aqui para fazer login</a>");
+    die("Você não pode acessar esta página porque não está logado. <a href='index.php'>Clique aqui para fazer login</a>");
 }
 
 $mensagem = "";
@@ -18,49 +18,86 @@ $id_atual = isset($_GET['id']) ? intval($_GET['id']) : null;
 // Create/Update
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $receita_id = intval($_POST['receita_id']);
-    $nome = $mysqli->real_escape_string($_POST['nome']);
+    $nome = trim($_POST['nome']);
     $nota = intval($_POST['nota']);
-    $texto = $mysqli->real_escape_string($_POST['texto']);
-    $id = isset($_POST['id']) ? intval($_POST['id']) : null;
+    $texto = trim($_POST['texto']);
+    $id = !empty($_POST['id']) ? intval($_POST['id']) : null;
 
-    if ($id) {
-        // UPDATE
-        $sql = "UPDATE comentarios SET receita_id = $receita_id, nome = '$nome', nota = $nota, texto = '$texto' WHERE id = $id";
-        $mysqli->query($sql) or die($mysqli->error);
-        $mensagem = "O comentário foi corrigido com sucesso!";
-    } else {
-        // CREATE
-        $sql = "INSERT INTO comentarios (receita_id, nome, nota, texto) VALUES ($receita_id, '$nome', $nota, '$texto')";
-        $mysqli->query($sql) or die($mysqli->error);
-        $mensagem = "Avaliação enviada! Obrigado por compartilhar sua experiência.";
+    try {
+        if ($id) {
+            // UPDATE
+            $sql = "UPDATE comentarios SET receita_id = :receita_id, nome = :nome, nota = :nota, texto = :texto WHERE id = :id";
+            $stmt = $pdo->prepare($sql);
+            
+            $stmt->bindParam(':receita_id', $receita_id, PDO::PARAM_INT);
+            $stmt->bindParam(':nome', $nome);
+            $stmt->bindParam(':nota', $nota, PDO::PARAM_INT);
+            $stmt->bindParam(':texto', $texto);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            
+            $stmt->execute();
+            $mensagem = "O comentário foi corrigido com sucesso!";
+        } else {
+            // CREATE 
+            $sql = "INSERT INTO comentarios (receita_id, nome, nota, texto) VALUES (:receita_id, :nome, :nota, :texto)";
+            $stmt = $pdo->prepare($sql);
+            
+            $stmt->bindParam(':receita_id', $receita_id, PDO::PARAM_INT);
+            $stmt->bindParam(':nome', $nome);
+            $stmt->bindParam(':nota', $nota, PDO::PARAM_INT);
+            $stmt->bindParam(':texto', $texto);
+            
+            $stmt->execute();
+            $mensagem = "Avaliação enviada! Obrigado por compartilhar sua experiência.";
+        }
+    } catch (PDOException $e) {
+        die("Erro ao salvar comentário: " . $e->getMessage());
     }
+    
     $acao = 'listar'; 
 }
 
 // DELETE
 if ($acao === 'deletar' && $id_atual) {
-    $sql = "DELETE FROM comentarios WHERE id = $id_atual";
-    $mysqli->query($sql) or die($mysqli->error);
-    $mensagem = "O comentário foi removido do sistema.";
+    try {
+        $sql = "DELETE FROM comentarios WHERE id = :id";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':id', $id_atual, PDO::PARAM_INT);
+        $stmt->execute();
+        $mensagem = "O comentário foi removido do sistema.";
+    } catch (PDOException $e) {
+        die("Erro ao deletar comentário: " . $e->getMessage());
+    }
     $acao = 'listar';
 }
 
 $comentario_selecionado = null;
 if ($acao === 'editar' && $id_atual) {
-    $sql = "SELECT * FROM comentarios WHERE id = $id_atual";
-    $resultado = $mysqli->query($sql) or die($mysqli->error);
-    $comentario_selecionado = $resultado->fetch_assoc();
+    try {
+        $sql = "SELECT * FROM comentarios WHERE id = :id";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':id', $id_atual, PDO::PARAM_INT);
+        $stmt->execute();
+        $comentario_selecionado = $stmt->fetch(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        die("Erro ao carregar o comentário para edição: " . $e->getMessage());
+    }
 }
 
 // READ
-$sql_todos = "SELECT c.*, r.titulo as nome_receita 
-              FROM comentarios c 
-              JOIN receitas r ON c.receita_id = r.id 
-              ORDER BY c.id DESC";
-$lista_comentarios = $mysqli->query($sql_todos) or die($mysqli->error);
+try {
+    $sql_todos = "SELECT c.*, r.titulo as nome_receita 
+                  FROM comentarios c 
+                  JOIN receitas r ON c.receita_id = r.id 
+                  ORDER BY c.id DESC";
+    $stmt_comentarios = $pdo->query($sql_todos);
 
-$sql_receitas = "SELECT id, titulo FROM receitas ORDER BY titulo ASC";
-$lista_receitas_form = $mysqli->query($sql_receitas) or die($mysqli->error);
+    $sql_receitas = "SELECT id, titulo FROM receitas ORDER BY titulo ASC";
+    $stmt_receitas = $pdo->query($sql_receitas);
+} catch (PDOException $e) {
+    die("Erro ao carregar os dados: " . $e->getMessage());
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -93,7 +130,7 @@ $lista_receitas_form = $mysqli->query($sql_receitas) or die($mysqli->error);
         </nav>
         
         <div class="sidebar-footer">
-            <a href="login.php" class="btn-sair">
+            <a href="index.php" class="btn-sair">
                 <span class="icon"><img src="imagens/sair.png" width="32" height="32" alt="Sair"></span> Sair
             </a>
         </div>
@@ -133,7 +170,7 @@ $lista_receitas_form = $mysqli->query($sql_receitas) or die($mysqli->error);
                         <label>Qual receita você testou?</label>
                         <select name="receita_id" required>
                             <option value="">-- Selecione uma receita --</option>
-                            <?php while($rec = $lista_receitas_form->fetch_assoc()): ?>
+                            <?php while($rec = $stmt_receitas->fetch(PDO::FETCH_ASSOC)): ?>
                                 <option value="<?php echo $rec['id']; ?>" 
                                     <?php echo (isset($comentario_selecionado) && $comentario_selecionado['receita_id'] == $rec['id']) ? 'selected' : ''; ?>>
                                     <?php echo $rec['titulo']; ?>
@@ -172,15 +209,14 @@ $lista_receitas_form = $mysqli->query($sql_receitas) or die($mysqli->error);
             <?php else: ?>
 
                 <h1 class="titulo-sessao">Mural de Avaliações</h1>
-
-                <?php if ($lista_comentarios->num_rows == 0): ?>
+                <?php if ($stmt_comentarios->rowCount() == 0): ?>
                     <div class="aviso-vazio">
                         <h3>Nenhum prato foi avaliado ainda...</h3>
                         <p>Seja o primeiro a contar o que achou clicando em <strong>"Avaliar Receita"</strong> ali em cima!</p>
                     </div>
                 <?php else: ?>
                     <div class="grade-comentarios">
-                        <?php while($c = $lista_comentarios->fetch_assoc()): ?>
+                        <?php while($c = $stmt_comentarios->fetch(PDO::FETCH_ASSOC)): ?>
                             <div class="card-comentario">
                                 <div class="card-topo">
                                     <span class="card-nome"><?php echo htmlspecialchars($c['nome']); ?></span>

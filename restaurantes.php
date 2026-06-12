@@ -7,7 +7,7 @@ if (!isset($_SESSION)) {
 }
 
 if (!isset($_SESSION['id'])) {
-    die("Você não pode acessar esta página porque não está logado. <a href='login.php'>Clique aqui para fazer login</a>");
+    die("Você não pode acessar esta página porque não está logado. <a href='index.php'>Clique aqui para fazer login</a>");
 }
 
 $mensagem = "";
@@ -17,45 +17,84 @@ $id_atual = isset($_GET['id']) ? intval($_GET['id']) : null;
 
 // Create/Update
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nome = $mysqli->real_escape_string($_POST['nome']);
-    $tipo_comida = $mysqli->real_escape_string($_POST['tipo_comida']);
-    $localizacao = $mysqli->real_escape_string($_POST['localizacao']);
+    $nome = trim($_POST['nome']);
+    $tipo_comida = trim($_POST['tipo_comida']);
+    $localizacao = trim($_POST['localizacao']);
     $nota = intval($_POST['nota']);
-    $descricao = $mysqli->real_escape_string($_POST['descricao']);
-    $id = isset($_POST['id']) ? intval($_POST['id']) : null;
+    $descricao = trim($_POST['descricao']);
+    $id = !empty($_POST['id']) ? intval($_POST['id']) : null;
 
-    if ($id) {
-        // UPDATE
-        $sql = "UPDATE restaurantes SET nome = '$nome', tipo_comida = '$tipo_comida', localizacao = '$localizacao', nota = $nota, descricao = '$descricao' WHERE id = $id";
-        $mysqli->query($sql) or die($mysqli->error);
-        $mensagem = "A recomendação do restaurante foi atualizada!";
-    } else {
-        // CREATE
-        $sql = "INSERT INTO restaurantes (nome, tipo_comida, localizacao, nota, descricao) VALUES ('$nome', '$tipo_comida', '$localizacao', $nota, '$descricao')";
-        $mysqli->query($sql) or die($mysqli->error);
-        $mensagem = "Novo restaurante adicionado ao guia gastronômico do Gonger!";
+    try {
+        if ($id) {
+            // UPDATE 
+            $sql = "UPDATE restaurantes SET nome = :nome, tipo_comida = :tipo_comida, localizacao = :localizacao, nota = :nota, descricao = :descricao WHERE id = :id";
+            $stmt = $pdo->prepare($sql);
+            
+            $stmt->bindParam(':nome', $nome);
+            $stmt->bindParam(':tipo_comida', $tipo_comida);
+            $stmt->bindParam(':localizacao', $localizacao);
+            $stmt->bindParam(':nota', $nota, PDO::PARAM_INT);
+            $stmt->bindParam(':descricao', $descricao);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            
+            $stmt->execute();
+            $mensagem = "A recomendação do restaurante foi atualizada!";
+        } else {
+            // CREATE
+            $sql = "INSERT INTO restaurantes (nome, tipo_comida, localizacao, nota, descricao) VALUES (:nome, :tipo_comida, :localizacao, :nota, :descricao)";
+            $stmt = $pdo->prepare($sql);
+            
+            $stmt->bindParam(':nome', $nome);
+            $stmt->bindParam(':tipo_comida', $tipo_comida);
+            $stmt->bindParam(':localizacao', $localizacao);
+            $stmt->bindParam(':nota', $nota, PDO::PARAM_INT);
+            $stmt->bindParam(':descricao', $descricao);
+            
+            $stmt->execute();
+            $mensagem = "Novo restaurante adicionado ao guia gastronômico do Gonger!";
+        }
+    } catch (PDOException $e) {
+        die("Erro ao salvar restaurante: " . $e->getMessage());
     }
+    
     $acao = 'listar'; 
 }
 
 // DELETE
 if ($acao === 'deletar' && $id_atual) {
-    $sql = "DELETE FROM restaurantes WHERE id = $id_atual";
-    $mysqli->query($sql) or die($mysqli->error);
-    $mensagem = "O restaurante foi removido do nosso guia.";
+    try {
+        $sql = "DELETE FROM restaurantes WHERE id = :id";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':id', $id_atual, PDO::PARAM_INT);
+        $stmt->execute();
+        $mensagem = "O restaurante foi removido do nosso guia.";
+    } catch (PDOException $e) {
+        die("Erro ao deletar restaurante: " . $e->getMessage());
+    }
     $acao = 'listar';
 }
 
 $restaurante_selecionado = null;
 if ($acao === 'editar' && $id_atual) {
-    $sql = "SELECT * FROM restaurantes WHERE id = $id_atual";
-    $resultado = $mysqli->query($sql) or die($mysqli->error);
-    $restaurante_selecionado = $resultado->fetch_assoc();
+    try {
+        $sql = "SELECT * FROM restaurantes WHERE id = :id";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':id', $id_atual, PDO::PARAM_INT);
+        $stmt->execute();
+        $restaurante_selecionado = $stmt->fetch(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        die("Erro ao carregar restaurante para edição: " . $e->getMessage());
+    }
 }
 
 // READ
-$sql_todos = "SELECT * FROM restaurantes ORDER BY id DESC";
-$lista_restaurantes = $mysqli->query($sql_todos) or die($mysqli->error);
+try {
+    $sql_todos = "SELECT * FROM restaurantes ORDER BY id DESC";
+    $lista_restaurantes = $pdo->query($sql_todos);
+} catch (PDOException $e) {
+    die("Erro ao carregar a lista de restaurantes: " . $e->getMessage());
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -88,7 +127,7 @@ $lista_restaurantes = $mysqli->query($sql_todos) or die($mysqli->error);
         </nav>
         
         <div class="sidebar-footer">
-            <a href="login.php" class="btn-sair">
+            <a href="index.php" class="btn-sair">
                 <span class="icon"><img src="imagens/sair.png" width="32" height="32" alt="Sair"></span> Sair
             </a>
         </div>
@@ -164,15 +203,14 @@ $lista_restaurantes = $mysqli->query($sql_todos) or die($mysqli->error);
             <?php else: ?>
 
                 <h1 class="titulo-sessao">Guia de Restaurantes da Comunidade</h1>
-
-                <?php if ($lista_restaurantes->num_rows == 0): ?>
+                <?php if ($lista_restaurantes->rowCount() == 0): ?>
                     <div class="aviso-vazio">
                         <h3>O guia está vazio...</h3>
                         <p>Nenhum restaurante foi indicado ainda. Que tal ser o primeiro clicando em <strong>"Indicar Restaurante"</strong> ali em cima?</p>
                     </div>
                 <?php else: ?>
                     <div class="grade-restaurantes">
-                        <?php while($rest = $lista_restaurantes->fetch_assoc()): ?>
+                        <?php while($rest = $lista_restaurantes->fetch(PDO::FETCH_ASSOC)): ?>
                             <div class="card-restaurante">
                                 <div class="rest-topo">
                                     <h3 class="rest-nome"><?php echo htmlspecialchars($rest['nome']); ?></h3>

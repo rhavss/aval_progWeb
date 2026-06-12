@@ -5,33 +5,40 @@ $erro = "";
 
 if(isset($_POST['email']) || isset($_POST['senha'])) {
 
-    if(strlen($_POST['email']) == 0) {
+    if(strlen(trim($_POST['email'])) == 0) {
         $erro = "Você esqueceu de preencher seu email";
-    } else if(strlen($_POST['senha']) == 0) {
+    } else if(strlen(trim($_POST['senha'])) == 0) {
         $erro = "Você esqueceu de preencher sua senha";
     } else {
 
-        $email = $mysqli->real_escape_string($_POST['email']);
-        $senha = $mysqli->real_escape_string($_POST['senha']);
+        $email = $_POST['email'];
+        $senha = $_POST['senha'];
 
-        $sql_code = "SELECT * FROM usuarios WHERE email = '$email' AND senha = '$senha'";
-        $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
+        try {
+            $sql_code = "SELECT * FROM usuarios WHERE email = :email AND senha = :senha";
+            $stmt = $pdo->prepare($sql_code);
+         
+            $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+            $stmt->bindParam(':senha', $senha, PDO::PARAM_STR);
+         
+            $stmt->execute();
 
-        $quantidade = $sql_query->num_rows;
+            if($stmt->rowCount() == 1) {
+                $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if($quantidade == 1) {
-            $usuario = $sql_query->fetch_assoc();
+                if(!isset($_SESSION)) {
+                    session_start();
+                }
 
-            if(!isset($_SESSION)) {
-                session_start();
+                $_SESSION['id'] = $usuario['id'];
+
+                header("Location: receitas.php");
+                exit();
+            } else {
+                $erro = "Seu e-mail ou sua senha estão incorretos";
             }
-
-            $_SESSION['id'] = $usuario['id'];
-
-            header("Location: receitas.php");
-            exit();
-        } else {
-            $erro = "Seu e-mail ou sua senha estão incorretos";
+        } catch (PDOException $e) {
+            die("Falha na execução do código SQL: " . $e->getMessage());
         }
     }
 }
@@ -50,22 +57,17 @@ if(isset($_POST['email']) || isset($_POST['senha'])) {
     
 <form action="" method="POST">
     <div class="titulo">
-
         <img class="img2" src="imagens/icon.png">
         <h1>Acesse o livro de receitas online de Gonger</h1>
-
     </div>
 
     <?php if(!empty($erro)): ?>
-
         <div class="mensagem-erro" style="color: #dd5d5d; font-weight: bold; margin-bottom: 20px;">
             <?php echo $erro; ?>
         </div>
-
     <?php endif; ?>
     
     <div class="conteudo-form">
-
         <div class="camposLogin">
             <p>
                 <label>E-mail</label>
@@ -77,9 +79,7 @@ if(isset($_POST['email']) || isset($_POST['senha'])) {
             </p>
             <button type="submit">Entrar</button>
         </div>
-
         <img class="img1" src="imagens/imgForm.png">
-
     </div> 
 </form>
 
