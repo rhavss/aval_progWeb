@@ -29,5 +29,5 @@ CREATE TABLE IF NOT EXISTS restaurantes (
     tipo_comida VARCHAR(50) NOT NULL,
     localizacao VARCHAR(150) NOT NULL,
     nota INT NOT NULL CHECK(nota >= 1 AND nota <= 5),
-    descricao TEXT NOT NULL,
+    descricao TEXT NOT NULL
 );
